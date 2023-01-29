@@ -11,7 +11,7 @@ variables:
   azureServiceConnectionId: 'aba5eb9e-b67f-4359-a71e-f41f579d3eed'
 
   # Web app name
-  webAppName: ''
+  webAppName: 'stock-forecaster'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -23,7 +23,7 @@ variables:
   projectRoot: $(System.DefaultWorkingDirectory)
 
   # Python version: 3.7
-  pythonVersion: '3.7'
+  pythonVersion: '3.9.14'
 
 stages:
 - stage: Build
