@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys
-sys.path.insert(0, "/home/michel/Projects/mlops_practice/src")
 from utils import *
-
 # make the dataset
 PERIOD = '800d'
 INTERVAL = '1d'
