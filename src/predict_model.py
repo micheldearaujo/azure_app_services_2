@@ -29,7 +29,6 @@ def main():
     
     # Create the future dataframe using the make_future_df function
     future_df = make_future_df(model_config["FORECAST_HORIZON"], stock_df_feat, features_list)
-    
     # Make predictions using the future dataframe and specified forecast horizon
     predictions_df = make_predict(
         forecast_horizon=model_config["FORECAST_HORIZON"]-4,

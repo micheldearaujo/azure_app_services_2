@@ -49,6 +49,8 @@ model_config = {
     "REGISTER_MODEL_NAME": "Stock_Predictor"
 }
 
+features_list = ["day_of_month", "month", "quarter", "Close_lag_1"]
+
 # Define a ação para procurar
 #STOCK_NAME = 'BOVA11.SA'
 

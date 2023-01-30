@@ -43,7 +43,3 @@ def build_features(raw_df: pd.DataFrame, features_list: list) -> pd.DataFrame:
 
     return stock_df_featurized
 
-
-features_list = ["day_of_month", "month", "quarter", "Close_lag_1"]
-feat_df = build_features(stock_df, features_list)
-

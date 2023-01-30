@@ -16,7 +16,7 @@ def make_dataset(stock_name: str, period: str, interval: str):
         interval (str): The frequency of the data, e.g. '1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo'.
     
     Returns:
-        None
+        pandas.DataFrame: The dataframe containing the closing prices of the given stock.
     """
 
     stock_price_df = yfin.Ticker(stock_name).history(period=period, interval=interval)
@@ -27,6 +27,8 @@ def make_dataset(stock_name: str, period: str, interval: str):
     stock_price_df['Date'] = stock_price_df['Date'].apply(lambda x: x.date())
     stock_price_df['Date'] = pd.to_datetime(stock_price_df['Date'])
     stock_price_df.to_csv('./data/raw/raw_stock_prices.csv', index=False)
+
+    return stock_price_df
 
 
 def build_features(raw_df: pd.DataFrame, features_list: list) -> pd.DataFrame:
@@ -45,13 +47,13 @@ def build_features(raw_df: pd.DataFrame, features_list: list) -> pd.DataFrame:
     stock_df_featurized = raw_df.copy()
     for feature in features_list:
         
-        # Create "Time" features]
+        # create "Time" features
         if feature == "day_of_month":
-            stock_df_featurized['day_of_month'] = stock_df_featurized["Date"].apply(lambda x: x.day)
+            stock_df_featurized['day_of_month'] = stock_df_featurized["Date"].apply(lambda x: float(x.day))
         elif feature == "month":
-            stock_df_featurized['month'] = stock_df_featurized['Date'].apply(lambda x: x.month)
+            stock_df_featurized['month'] = stock_df_featurized['Date'].apply(lambda x: float(x.month))
         elif feature == "quarter":
-            stock_df_featurized['quarter'] = stock_df_featurized['Date'].apply(lambda x: x.quarter)
+            stock_df_featurized['quarter'] = stock_df_featurized['Date'].apply(lambda x: float(x.quarter))
 
     # Create "Lag" features
     # The lag 1 feature will become the main regressor, and the regular "Close" will become the target.
@@ -176,7 +178,6 @@ def train_model(X_train: pd.DataFrame,  y_train: pd.DataFrame, random_state:int=
         )
 
     # save model
-    print(xgboost_model.feature_names_in_)
     dump(xgboost_model, f"./models/{model_config['REGISTER_MODEL_NAME']}.joblib")
 
     return xgboost_model
@@ -251,13 +252,12 @@ def validate_model(X:pd.DataFrame, y:pd.Series, forecast_horizon: int) -> pd.Dat
         actuals.append(y_test.values[0])
         dates.append(X_test["Date"].max())
 
-    
     # Calculate the resulting metric
     model_mape = round(mean_absolute_percentage_error(actuals, predictions), 4)
     model_rmse = round(np.sqrt(mean_squared_error(actuals, predictions)), 2)
  
     pred_df = pd.DataFrame(list(zip(dates, actuals, predictions)), columns=["Date", 'Actual', 'Forecast'])
-    print(pred_df)
+    pred_df["Forecast"] = pred_df["Forecast"].astype("float64")
     #visualize_validation_results(pred_df, model_mape, model_rmse)
 
     return pred_df
@@ -289,15 +289,14 @@ def make_future_df(forecast_horzion: int, model_df: pd.DataFrame, features_list:
     future_df = future_df[future_df["day_of_week"].isin(["Sunday", "Saturday"]) == False]
     future_df = future_df.drop("day_of_week", axis=1)
     future_df = future_df.reset_index(drop=True)
-    
+
     # Ensure the data types of the features are correct
-    for feature in inference_features_list:
-        future_df[feature] = future_df[feature].astype("int")
+    #for feature in inference_features_list:
+    #    future_df[feature] = future_df[feature].astype("int")
     
     # set the first lagged price value to the last price from the training data
     future_df["Close_lag_1"] = 0
     future_df.loc[future_df.index.min(), "Close_lag_1"] = model_df[model_df["Date"] == last_training_day]['Close'].values[0]
-    
     return future_df
 
 
@@ -326,6 +325,7 @@ def make_predict(forecast_horizon: int, future_df: pd.DataFrame) -> pd.DataFrame
     model = load(f"./models/{model_config['REGISTER_MODEL_NAME']}.joblib")
 
     for day in range(0, forecast_horizon):
+        print("oi")
 
         # extract the next day to predict
         x_inference = pd.DataFrame(future_df_feat.drop("Date", axis=1).loc[day, :]).transpose()
