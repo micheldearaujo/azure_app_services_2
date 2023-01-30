@@ -6,7 +6,7 @@ INTERVAL = '1d'
 STOCK_NAME = 'BOVA11.SA'  #str(input("Which stock do you want to track? "))
 
 # download the dataset
-make_dataset(STOCK_NAME, PERIOD, INTERVAL)
+#make_dataset(STOCK_NAME, PERIOD, INTERVAL)
 
 # load the raw dataset
 stock_df = pd.read_csv("./data/raw/raw_stock_prices.csv", parse_dates=True)
