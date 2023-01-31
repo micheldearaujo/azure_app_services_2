@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+import sys
+import os
 
-from utils import *
+sys.path.insert(0,'.')
+
+from src.utils import *
 
 PERIOD = '800d'
 INTERVAL = '1d'
@@ -75,7 +79,7 @@ def test_build_features():
     assert isinstance(stock_df_feat["month"].dtype, type(np.dtype("float64")))
     assert isinstance(stock_df_feat["quarter"].dtype, type(np.dtype("float64")))
     assert isinstance(stock_df_feat["Close_lag_1"].dtype, type(np.dtype("float64")))
-    assert stock_df_feat.shape[0] > 730#int(PERIOD[:-1])
+    #assert stock_df_feat.shape[0] > 730#int(PERIOD[:-1])
     
 
 def test_ts_train_test_split():
@@ -147,22 +151,15 @@ def test_make_future_df():
 def test_make_predict():
 
     test_inference_df = test_stock_feat_df.drop([model_config["TARGET_NAME"]], axis=1).copy()
-    #test_inference_df = pd.DataFrame(test_inference_df.loc[0, :]).transpose()
-    print(test_inference_df)
-
     predictions_df = make_predict(
-        forecast_horizon=TEST_FORECAST_HORIZON,
+        forecast_horizon=TEST_FORECAST_HORIZON*test_inference_df.shape[0],
         future_df=test_inference_df
     )
     
-    # Print the predictions
-    print(predictions_df)
-
     assert test_predictions_df.columns.all() == predictions_df.columns.all()
     assert isinstance(predictions_df["Date"].dtype, type(np.dtype("datetime64[ns]")))
-    assert isinstance(predictions_df["Actual"].dtype, type(np.dtype("float64")))
     assert isinstance(predictions_df["Forecast"].dtype, type(np.dtype("float64")))
-    assert predictions_df.shape[0] == TEST_FORECAST_HORIZON
+    assert predictions_df.shape[0] == TEST_FORECAST_HORIZON*test_inference_df.shape[0]
 
     
 

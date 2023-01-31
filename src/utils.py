@@ -3,7 +3,12 @@
 # - Utilities script -
 # ------------------------
 
-from config import *
+import os
+import sys
+
+sys.path.insert(0,'.')
+
+from src.config import *
 
 
 def make_dataset(stock_name: str, period: str, interval: str):
@@ -314,8 +319,6 @@ def make_predict(forecast_horizon: int, future_df: pd.DataFrame) -> pd.DataFrame
         None
     """
 
-    logger.info("Starting the pipeline..")
-
     future_df_feat = future_df.copy()
 
     # Create empty list for storing each prediction
@@ -325,7 +328,6 @@ def make_predict(forecast_horizon: int, future_df: pd.DataFrame) -> pd.DataFrame
     model = load(f"./models/{model_config['REGISTER_MODEL_NAME']}.joblib")
 
     for day in range(0, forecast_horizon):
-        print("oi")
 
         # extract the next day to predict
         x_inference = pd.DataFrame(future_df_feat.drop("Date", axis=1).loc[day, :]).transpose()
@@ -340,8 +342,9 @@ def make_predict(forecast_horizon: int, future_df: pd.DataFrame) -> pd.DataFrame
         else:
             # check if it is the last day, so we stop
             break
-    
+
     future_df_feat["Forecast"] = predictions
+    future_df_feat["Forecast"] = future_df_feat["Forecast"].astype('float64')
     future_df_feat = future_df_feat[["Date", "Forecast"]].copy()
     return future_df_feat
 

@@ -58,4 +58,4 @@ features_list = ["day_of_month", "month", "quarter", "Close_lag_1"]
 log_format = "[%(name)s][%(levelname)-6s] %(message)s"
 logging.basicConfig(format=log_format)
 logger = logging.getLogger("describe")
-logger.setLevel(logging.ERROR)
+logger.setLevel(logging.INFO)

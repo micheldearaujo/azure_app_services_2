@@ -13,6 +13,11 @@ jobs:
     - name: Install dependencies
       run: |
         make install
+
+    - name: Test
+      run: |
+        make test
+
     - name: Lint
       run: |
         make lint
@@ -20,6 +25,7 @@ jobs:
     - name: Format
       run: |
         make format
+
     - name: Clean
       run: |
         make clean
