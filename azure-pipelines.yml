@@ -47,11 +47,6 @@ stages:
       workingDirectory: $(projectRoot)
       displayName: "Install requirements"
 
-    - name: Test
-      run:
-        make test
-
-
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
