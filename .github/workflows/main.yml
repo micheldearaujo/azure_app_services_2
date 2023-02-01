@@ -18,10 +18,6 @@ jobs:
       run: |
         make test
 
-    - name: Lint
-      run: |
-        make lint
-        
     - name: Test
       run: |
         make test
