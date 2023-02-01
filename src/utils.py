@@ -160,6 +160,65 @@ def visualize_validation_results(pred_df: pd.DataFrame, model_mape: float, model
     plt.show()
 
 
+def visualize_forecast(pred_df: pd.DataFrame, historical_df: pd.DataFrame, stock_name: str):
+    """
+    Creates visualizations of the model forecast
+
+    Paramters:
+        pred_df: DataFrame with true values, predictions and the date column
+        historical_df: DataFrame with historical values
+
+    Returns:
+        None
+    """
+
+    logger.info("Vizualizing the results...")
+
+    fig, axs = plt.subplots(figsize=(12, 5), dpi = 2000)
+    # Plot the Actuals
+    sns.lineplot(
+        data=historical_df,
+        x="Date",
+        y="Close",
+        label="Historical values",
+        ax=axs
+    )
+    sns.scatterplot(
+        data=historical_df,
+        x="Date",
+        y="Close",
+        ax=axs,
+        size="Close",
+        sizes=(80, 80),
+        legend=False
+    )
+
+    # Plot the Forecasts
+    sns.lineplot(
+        data=pred_df,
+        x="Date",
+        y="Forecast",
+        label="Forecast values",
+        ax=axs
+    )
+    sns.scatterplot(
+        data=pred_df,
+        x="Date",
+        y="Forecast",
+        ax=axs,
+        size="Forecast",
+        sizes=(80, 80),
+        legend=False
+    )
+
+    axs.set_title(f"Default XGBoost {model_config['FORECAST_HORIZON']-4} days Forecast for {stock_name}")
+    axs.set_xlabel("Date")
+    axs.set_ylabel("R$")
+
+    #plt.show()
+    return fig
+
+
 def train_model(X_train: pd.DataFrame,  y_train: pd.DataFrame, random_state:int=42):
     """
     Trains a XGBoost model for Forecasting
